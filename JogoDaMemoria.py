@@ -124,9 +124,7 @@ def enviaTabuleiroServidor(tabuleiro):
     string = ''.join(map(str,tabuleiro))
     s.sendall(string)
 
-def enviaPlacarServidor(placar):
-    string = ''.join(map(str,placar))
-    s.sendall(string)
+
 # Abre (revela) peca na posicao (i, j). Se posicao ja esta
 # aberta ou se ja foi removida, retorna False. Retorna True
 # caso contrario.
@@ -206,6 +204,8 @@ def imprimeStatus(tabuleiro, placar, vez):
 
 # Le um coordenadas de uma peca. Retorna uma tupla do tipo (i, j)
 # em caso de sucesso, ou False em caso de erro.
+
+
 def leCoordenada(dim):
 
     input = raw_input("Especifique uma peca: ")
@@ -233,7 +233,7 @@ def leCoordenada(dim):
     s.send(str(i).encode())
     s.send(str(j).encode())
     return (i, j)
-
+#le as coordenadas enviadas pelo servidor
 def leCoordenadaServidor(dim,i,j):
 
 
@@ -288,7 +288,7 @@ while paresEncontrados < totalDePares:
         # Requisita primeira peca do proximo jogador
         while True:
             imprimeStatus(tabuleiro, placar, vez)
-            print('vez do serv')
+            print('vez do servidor')
 
             # Solicita coordenadas da primeira peca.
             i=s.recv(1024)
@@ -315,7 +315,7 @@ while paresEncontrados < totalDePares:
 
         while True:
             imprimeStatus(tabuleiro, placar, vez)
-            print('vez do serv')
+            print('vez do servidor')
             # Solicita coordenadas da primeira peca.
             i=s.recv(1024)
             i=int(i.decode())

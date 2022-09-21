@@ -8,16 +8,17 @@ HOST = 'localhost'
 PORT = 50000
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind((HOST,PORT))
+s.bind((HOST, PORT))
 s.listen(0)
 print('Servidor aberto')
-conn,ender = s.accept()
-print('Conectado',ender)
+conn, ender = s.accept()
+print('Conectado', ender)
 
 def split(list_a, chunk_size):
 
   for i in range(0, len(list_a), chunk_size):
     yield list_a[i:i + chunk_size]
+
 def recebeTabuleiro(tabuleiro):
 
    tabuleiro = tabuleiro.replace('[',' ')
@@ -222,6 +223,9 @@ def imprimeStatus(tabuleiro, placar, vez):
 
 # Le um coordenadas de uma peca. Retorna uma tupla do tipo (i, j)
 # em caso de sucesso, ou False em caso de erro.
+
+
+#alterações na leitura de coordenadas para poder ler coords enviadas e recebidas
 def leCoordenada(dim):
 
     input = raw_input("Especifique uma peca: ")
@@ -301,20 +305,19 @@ vez = 0
 tabuleiro=conn.recv(1024)
 tabuleiro=recebeTabuleiro(tabuleiro)
 while paresEncontrados < totalDePares:
-    if(vez%2==0):
+    if(vez%2==0):##quando for vez do cliente
         # Requisita primeira peca do proximo jogador
         while True:
             imprimeStatus(tabuleiro, placar, vez)
-            print('vez do cli')
+            print('vez do cliente')
             # Solicita coordenadas da primeira peca.
             i=conn.recv(1024)
             i=int(i.decode())
             j=conn.recv(1024)
             j=int(j.decode())
-
+            #recebe cliente
             print(i,j)
-            coordenadas = leCoordenadaCliente(dim,i,j)
-            print(i,j)
+            coordenadas = leCoordenadaCliente(dim,i,j)#manda coordenadas para o cliente
             if coordenadas == False:
                 continue
 
@@ -331,15 +334,15 @@ while paresEncontrados < totalDePares:
         # Requisita segunda peca do proximo jogador
         while True:
             imprimeStatus(tabuleiro, placar, vez)
-            print('vez do cli')
+            print('vez do cliente')
             # Solicita coordenadas da primeira peca.
             i=conn.recv(1024)
             i=int(i.decode())
             j=conn.recv(1024)
             j=int(j.decode())
+            #recebe cliente
             print(i,j)
-            coordenadas = leCoordenadaCliente(dim,i,j)
-            print(i,j)
+            coordenadas = leCoordenadaCliente(dim,i,j)#manda coordenadas para o cliente
             if coordenadas == False:
                 continue
 
@@ -353,7 +356,7 @@ while paresEncontrados < totalDePares:
 
             break
 
-    else:
+    else:#normal, igual a antes
 
         while True:
 
