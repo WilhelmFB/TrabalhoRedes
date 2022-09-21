@@ -1,25 +1,45 @@
+import socket
 import os
 import sys
 import time
 import random
-import socket
 
-##
-# Funcoes uteis
-##CONECTAR SERVIDOR###
-
-HOST = '127.0.0.1'
+HOST = 'localhost'
 PORT = 50000
-s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-s.connect((HOST,PORT))
 
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.bind((HOST,PORT))
+s.listen(0)
+print('Servidor aberto')
+conn,ender = s.accept()
+print('Conectado',ender)
+
+def split(list_a, chunk_size):
+
+  for i in range(0, len(list_a), chunk_size):
+    yield list_a[i:i + chunk_size]
+def recebeTabuleiro(tabuleiro):
+
+   tabuleiro = tabuleiro.replace('[',' ')
+   tabuleiro = tabuleiro.replace(']',' ')
+   tabuleiro = tabuleiro.replace(',','')
+   tabuleiro = tabuleiro.replace('-','')
+   tabuleiro = tabuleiro.replace(' ','')
+
+   tabuleir = map(int,tabuleiro)
+
+   tabuleir = list(map(lambda x: x*-1,tabuleir))
+
+   tabuleir= (list(split(tabuleir,4)))
+
+   return tabuleir
 
 #####
 
 
 # Limpa a tela.
 def limpaTela():
-    
+
     os.system('cls' if os.name == 'nt' else 'clear')
 
 ##
@@ -73,7 +93,7 @@ def imprimeTabuleiro(tabuleiro):
         sys.stdout.write("\n")
 
 
-# Cria um novo tabuleiro com pecas aleatorias. 
+# Cria um novo tabuleiro com pecas aleatorias.
 # 'dim' eh a dimensao do tabuleiro, necessariamente
 # par.
 def novoTabuleiro(dim):
@@ -98,7 +118,7 @@ def novoTabuleiro(dim):
 
             posicoesDisponiveis.append((i, j))
 
-    # Varre todas as pecas que serao colocadas no 
+    # Varre todas as pecas que serao colocadas no
     # tabuleiro e posiciona cada par de pecas iguais
     # em posicoes aleatorias.
     for j in range(0, dim / 2):
@@ -117,16 +137,12 @@ def novoTabuleiro(dim):
             rI, rJ = posicoesDisponiveis.pop(indiceAleatorio)
 
             tabuleiro[rI][rJ] = -i
-    enviaTabuleiroServidor(tabuleiro)
+
     return tabuleiro
 
-def enviaTabuleiroServidor(tabuleiro):
-    string = ''.join(map(str,tabuleiro))
-    s.sendall(string)
 
-def enviaPlacarServidor(placar):
-    string = ''.join(map(str,placar))
-    s.sendall(string)
+
+
 # Abre (revela) peca na posicao (i, j). Se posicao ja esta
 # aberta ou se ja foi removida, retorna False. Retorna True
 # caso contrario.
@@ -164,7 +180,7 @@ def removePeca(tabuleiro, i, j):
         tabuleiro[i][j] = "-"
         return True
 
-## 
+##
 # Funcoes de manipulacao do placar
 ##
 
@@ -230,13 +246,12 @@ def leCoordenada(dim):
         print "Coordenada j deve ser maior ou igual a zero e menor que {0}".format(dim)
         raw_input("Pressione <enter> para continuar...")
         return False
-    s.send(str(i).encode())
-    s.send(str(j).encode())
+    conn.send(str(i).encode())
+    conn.send(str(j).encode())
     return (i, j)
 
-def leCoordenadaServidor(dim,i,j):
 
-
+def leCoordenadaCliente(dim,i,j):
 
     print("Especifique uma peca: ")
     if i < 0 or i >= dim:
@@ -252,6 +267,8 @@ def leCoordenadaServidor(dim,i,j):
         return False
 
     return (i, j)
+
+
 
 
 ##
@@ -277,26 +294,26 @@ tabuleiro = novoTabuleiro(dim)
 # Cria um novo placar zerado
 placar = novoPlacar(nJogadores)
 
-# Partida continua enquanto ainda ha pares de pecas a 
+# Partida continua enquanto ainda ha pares de pecas a
 # casar.
 paresEncontrados = 0
 vez = 0
+tabuleiro=conn.recv(1024)
+tabuleiro=recebeTabuleiro(tabuleiro)
 while paresEncontrados < totalDePares:
-
-    if(vez%2!=0):
-
+    if(vez%2==0):
         # Requisita primeira peca do proximo jogador
         while True:
             imprimeStatus(tabuleiro, placar, vez)
-            print('vez do serv')
-
+            print('vez do cli')
             # Solicita coordenadas da primeira peca.
-            i=s.recv(1024)
+            i=conn.recv(1024)
             i=int(i.decode())
-            j=s.recv(1024)
+            j=conn.recv(1024)
             j=int(j.decode())
+
             print(i,j)
-            coordenadas = leCoordenadaServidor(dim,i,j)
+            coordenadas = leCoordenadaCliente(dim,i,j)
             print(i,j)
             if coordenadas == False:
                 continue
@@ -312,17 +329,16 @@ while paresEncontrados < totalDePares:
             break
 
         # Requisita segunda peca do proximo jogador
-
         while True:
             imprimeStatus(tabuleiro, placar, vez)
-            print('vez do serv')
+            print('vez do cli')
             # Solicita coordenadas da primeira peca.
-            i=s.recv(1024)
+            i=conn.recv(1024)
             i=int(i.decode())
-            j=s.recv(1024)
+            j=conn.recv(1024)
             j=int(j.decode())
             print(i,j)
-            coordenadas = leCoordenadaServidor(dim,i,j)
+            coordenadas = leCoordenadaCliente(dim,i,j)
             print(i,j)
             if coordenadas == False:
                 continue
@@ -359,6 +375,7 @@ while paresEncontrados < totalDePares:
                 continue
 
             break
+
 
         # Requisita segunda peca do proximo jogador
         while True:
@@ -382,6 +399,8 @@ while paresEncontrados < totalDePares:
 
             break
 
+
+
     # Imprime status do jogo
     imprimeStatus(tabuleiro, placar, vez)
 
@@ -391,7 +410,7 @@ while paresEncontrados < totalDePares:
     if tabuleiro[i1][j1] == tabuleiro[i2][j2]:
 
         print "Pecas casam! Ponto para o jogador {0}.".format(vez + 1)
-        
+
         incrementaPlacar(placar, vez)
         paresEncontrados = paresEncontrados + 1
         removePeca(tabuleiro, i1, j1)
@@ -401,7 +420,7 @@ while paresEncontrados < totalDePares:
     else:
 
         print "Pecas nao casam!"
-        
+
         time.sleep(3)
 
         fechaPeca(tabuleiro, i1, j1)
@@ -427,5 +446,7 @@ if len(vencedores) > 1:
 else:
 
     print "Jogador {0} foi o vencedor!".format(vencedores[0] + 1)
+
+
 
 
