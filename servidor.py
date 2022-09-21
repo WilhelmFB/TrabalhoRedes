@@ -302,7 +302,6 @@ tabuleiro=conn.recv(1024)
 tabuleiro=recebeTabuleiro(tabuleiro)
 while paresEncontrados < totalDePares:
     if(vez%2==0):
-        lixo=conn.recv(1024)
         # Requisita primeira peca do proximo jogador
         while True:
             imprimeStatus(tabuleiro, placar, vez)
@@ -313,6 +312,7 @@ while paresEncontrados < totalDePares:
             j=conn.recv(1024)
             j=int(j.decode())
 
+            print(i,j)
             coordenadas = leCoordenadaCliente(dim,i,j)
             print(i,j)
             if coordenadas == False:
@@ -324,13 +324,11 @@ while paresEncontrados < totalDePares:
             if abrePeca(tabuleiro, i1, j1) == False:
 
                 print "Escolha uma peca ainda fechada!"
-                raw_input("Pressione <enter> para continuar...")
                 continue
 
             break
 
         # Requisita segunda peca do proximo jogador
-        lixo=conn.recv(1024)
         while True:
             imprimeStatus(tabuleiro, placar, vez)
             print('vez do cli')
@@ -339,7 +337,7 @@ while paresEncontrados < totalDePares:
             i=int(i.decode())
             j=conn.recv(1024)
             j=int(j.decode())
-
+            print(i,j)
             coordenadas = leCoordenadaCliente(dim,i,j)
             print(i,j)
             if coordenadas == False:
@@ -351,11 +349,10 @@ while paresEncontrados < totalDePares:
             if abrePeca(tabuleiro, i2, j2) == False:
 
                 print "Escolha uma peca ainda fechada!"
-                raw_input("Pressione <enter> para continuar...")
                 continue
 
             break
-        lixo=conn.recv(1024)
+
     else:
 
         while True:
@@ -378,10 +375,6 @@ while paresEncontrados < totalDePares:
                 continue
 
             break
-
-
-
-
 
 
         # Requisita segunda peca do proximo jogador

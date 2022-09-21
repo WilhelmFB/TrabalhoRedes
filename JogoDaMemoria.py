@@ -199,7 +199,6 @@ def imprimeStatus(tabuleiro, placar, vez):
         sys.stdout.write('\n')
 
         imprimePlacar(placar)
-        enviaPlacarServidor(placar)
         sys.stdout.write('\n')
         sys.stdout.write('\n')
 
@@ -239,7 +238,7 @@ def leCoordenadaServidor(dim,i,j):
 
 
 
-
+    print("Especifique uma peca: ")
     if i < 0 or i >= dim:
 
         print "Coordenada i deve ser maior ou igual a zero e menor que {0}".format(dim)
@@ -296,7 +295,7 @@ while paresEncontrados < totalDePares:
             i=int(i.decode())
             j=s.recv(1024)
             j=int(j.decode())
-
+            print(i,j)
             coordenadas = leCoordenadaServidor(dim,i,j)
             print(i,j)
             if coordenadas == False:
@@ -308,7 +307,6 @@ while paresEncontrados < totalDePares:
             if abrePeca(tabuleiro, i1, j1) == False:
 
                 print "Escolha uma peca ainda fechada!"
-                raw_input("Pressione <enter> para continuar...")
                 continue
 
             break
@@ -323,7 +321,7 @@ while paresEncontrados < totalDePares:
             i=int(i.decode())
             j=s.recv(1024)
             j=int(j.decode())
-
+            print(i,j)
             coordenadas = leCoordenadaServidor(dim,i,j)
             print(i,j)
             if coordenadas == False:
@@ -335,7 +333,6 @@ while paresEncontrados < totalDePares:
             if abrePeca(tabuleiro, i2, j2) == False:
 
                 print "Escolha uma peca ainda fechada!"
-                raw_input("Pressione <enter> para continuar...")
                 continue
 
             break
@@ -362,11 +359,6 @@ while paresEncontrados < totalDePares:
                 continue
 
             break
-
-
-
-
-
 
         # Requisita segunda peca do proximo jogador
         while True:
